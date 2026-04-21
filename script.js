@@ -1,6 +1,6 @@
 let currentBase64Image = "";
 
-// 1. ฟังก์ชันคำนวณ (ซ่อนหน้ากรอก และโชว์หน้าเลือกรูป)
+// 1. ฟังก์ชันคำนวณ (กดปุ๊บ บันทึกลง Sheet ทันทีรอบแรก)
 async function calculate() {
     const inputSection = document.getElementById('input-section');
     const resultArea = document.getElementById('result-area');
@@ -28,37 +28,36 @@ async function calculate() {
     document.getElementById('advice-text').innerText = advice;
     document.getElementById('overlay-caption').innerText = caption;
 
-    // สลับหน้าจอ: ซ่อนหน้ากรอกข้อมูล
+    // สลับหน้าจอ
     inputSection.classList.add('hidden');
     resultArea.classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // --- บันทึกรอบที่ 1: เฉพาะตัวเลข ---
+    console.log("บันทึกรอบที่ 1: กำลังส่งข้อมูลขนาด...");
+    await sendDataToSheet(girth, calculatedSize, "No Image");
 }
 
-// 2. ฟังก์ชันเลือกรูปภาพ (เลือกปุ๊บ ส่งไป Google Sheet ปั๊บ)
+// 2. ฟังก์ชันเลือกรูปภาพ (เลือกปุ๊บ บันทึกรอบที่ 2 ทันที)
 function previewImage(event) {
     const reader = new FileReader();
     const file = event.target.files[0];
 
     if (!file) return;
 
-    // แสดงสถานะการทำงาน
-    console.log("กำลังเตรียมรูปภาพ...");
-
     reader.onload = async function() {
-        // กราฟิก Preview บนหน้าเว็บ
         document.getElementById('bgPreview').src = reader.result;
         currentBase64Image = reader.result; // เก็บ Base64 ไว้
         
         document.getElementById('capture-zone').classList.remove('hidden');
         document.getElementById('btn-save').classList.remove('hidden');
 
-        // --- หัวใจสำคัญ: ส่งข้อมูลไป Sheet ทันทีเมื่อรูปโหลดเสร็จ ---
+        // ดึงค่าล่าสุดมาส่ง
         const girthValue = document.getElementById('girth').value;
         const sizeValue = document.getElementById('size-value').innerText;
         
-        // แจ้งเตือนผู้ใช้เล็กน้อย (ทาง Console หรือ Alert)
-        console.log("จังหวะนี้แหละ! กำลังบันทึกลง Google Sheet...");
-        
+        // --- บันทึกรอบที่ 2: ทั้งขนาดและรูป ---
+        console.log("บันทึกรอบที่ 2: กำลังส่งข้อมูลพร้อมรูปภาพ...");
         await sendDataToSheet(girthValue, sizeValue, currentBase64Image);
     }
     reader.readAsDataURL(file);
@@ -69,10 +68,9 @@ async function sendDataToSheet(girth, size, image) {
     const url = 'https://script.google.com/macros/s/AKfycbwHhNMWseyFDGJWOeaUxvQz5zzy0WWSVZrhYzE_7HukaFuDuHQ1o8sQ6nmtFesOLKl_pA/exec';
     
     try {
-        // ใช้ fetch ส่งข้อมูล
         await fetch(url, {
             method: 'POST',
-            mode: 'no-cors', // สำคัญสำหรับ Google Apps Script
+            mode: 'no-cors', 
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -82,14 +80,13 @@ async function sendDataToSheet(girth, size, image) {
                 image: image 
             })
         });
-        
-        console.log("");
+        console.log("บันทึกข้อมูลเรียบร้อย!");
     } catch (e) {
-        console.error("");
+        console.error("เกิดข้อผิดพลาดในการบันทึก:", e);
     }
 }
 
-// 4. ฟังก์ชันบันทึกรูปลงในเครื่อง (สำหรับผู้ใช้กดเซฟเอง)
+// 4. ฟังก์ชันบันทึกรูปลงในเครื่อง
 function saveImage() {
     const zone = document.getElementById('capture-zone');
     if (typeof html2canvas === "undefined") {
