@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anaconda Size</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <div class="card">
+        <div class="card-header">
+            <h1>Anaconda Size</h1>
+        </div>
+
+        <div class="card-body">
+            <div id="input-section">
+                <div class="input-group">
+                    <label>เส้นรอบวงอนาคอนด้า (มิลลิเมตร)</label>
+                    <input type="number" id="girth" placeholder="ระบุตัวเลขอนาคอนด้า เช่น 125">
+                </div>
+                <button class="btn-main" onclick="calculate()">คำนวณขนาด</button>
+            </div>
+
+            <div id="result-area" class="hidden">
+                <div class="advice-box">
+                    <p>ไซส์ของคุณคือ</p>
+                    <div class="size-result"><span id="size-value">--</span> มม.</div>
+                    <p id="advice-text"></p>
+                </div>
+
+                <div class="image-feature">
+                    <h3>📸 เลือกรูปเพื่อทำรูปสรุปของคุณ</h3>
+                    <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
+                    
+                    <div id="capture-zone" class="image-container hidden">
+                        <img id="bgPreview" src="">
+                        <div class="overlay-text">
+                            <h2 id="overlay-size">--</h2>
+                            <p id="overlay-caption"></p>
+                        </div>
+                    </div>
+                    <button id="btn-save" class="btn-save hidden" onclick="saveImage()">💾 บันทึกรูปภาพ</button>
+                </div>
+                <button class="btn-reset" onclick="window.location.reload()">คำนวณใหม่</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
